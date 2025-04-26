@@ -1,0 +1,115 @@
+**Free
+
+   ctl-opt NOMAIN
+           OPTION(*SRCSTMT:*NODEBUGIO);
+
+   //*---------------------------------------------------------------*
+   //*  THIS MATERIAL IS LICENSED BY VISION-C CONSULTING INC (VCCI)  *
+   //*---------------------------------------------------------------*
+   //*                                                               *
+   //* DESIGNED BY: Hiram Hubbard                                    *
+   //*              Chief Development Officer                        *
+   //*  PROGRAM ID: SAR102M.*MODULE                                  *
+   //*                                                               *
+   //* This *Module is as an example to show how to use SQL          *
+   //*     I/O error handling.  (Example Only)                       *
+   //*                                                               *
+   //* Licensed Materials - Property of VCCI,  All rights reserved   *
+   //*****************************************************************
+   //* Compile Instructions                                          *
+   //*---------------------------------------------------------------*
+   //* After compiling this module, need to update service program   *
+   //*                                                               *
+   //*  UPDSRVPGM SRVPGM(SAR100S)                                    *
+   //*     MODULE(SAR100M SAR101M SAR102M                            *
+   //*     EXPORT(*SRCFILE)                                          *
+   //*     SRCFILE(QSRVSRC)                                          *
+   //*     SRCMBR(SA100_BND)                                         *
+   //*     ACTGRP(SALISTAG)                                          *
+   //*                                                               *
+   //*****************************************************************
+   //*  CONTROL #   INIT  DATE   DESCRIBE BASIC CHANGE               *
+   //* ***********  ***  ******  *************************************
+   //*              HLH 10/24/17 Initial Write                       *
+   //*****************************************************************
+
+   //*-------------------------------------------------------------*
+   //* Prototype and Interface Section                             *
+   //*-------------------------------------------------------------*
+      /copy sar100p
+
+   //*-------------------------------------------------------------*
+   //*    Data Stucture: Definition                                *
+   //*-------------------------------------------------------------*
+       dcl-ds MOD_SAS100_DS extname('SAS100DS') TEMPLATE Qualified;
+       end-ds MOD_SAS100_DS;
+
+   //*-------------------------------------------------------------*
+   //* Program Information Data structure                          *
+   //*-------------------------------------------------------------*
+      /copy ITRPSDS
+
+   //*-------------------------------------------------------------*
+   //*    Global Variables and Working Storage Definition          *
+   //*-------------------------------------------------------------*
+       dcl-s v_Return_Code         CHAR(1);
+
+   //*-------------------------------------------------------------*
+   //*    Global Constrants Definition                             *
+   //*-------------------------------------------------------------*
+
+   //*-------------------------------------------------------------*
+   //*  Program Entry *NoMain - NoMain Line Section                *
+   //*-------------------------------------------------------------*
+
+   //*  SQL Compile Options
+          exec sql
+            Set Option COMMIT    = *NONE,
+                       USRPRF    = *OWNER,
+                       DYNUSRPRF = *OWNER,
+                       DATFMT    = *ISO,
+                       DLYPRP    = *YES,
+                       NAMING    = *SYS,
+                       SQLPATH   = *LIBL,
+                       CLOSQLCSR = *ENDACTGRP;
+
+   //*------------------------------------------------------------*
+   //*  Procedure: sAGetIOSqlError                                *
+   //*    Purpose: Monitor for any SQL I/O Error Condition        *
+   //*------------------------------------------------------------*
+
+     dcl-proc sAGetIOSqlError            Export ;
+
+       dcl-pi *n  LIKE(v_Return_code);
+              SQL_IO_ERROR             LIKEDS(MOD_SAS100_DS);
+       end-pi;
+
+       dcl-s Log_Return_Code           LIKE(v_Return_code) inz('N');
+
+       dcl-c SQLSuccessFul             CONST('00000');
+       dcl-c SQLSuccessFulFlag         CONST('Y');
+
+          Clear SQL_IO_ERROR;
+
+          If SQLSTATE        = SQLSuccessFul;
+
+             Log_Return_Code = SQLSuccessFulFlag;
+
+          Endif;
+
+          exec sql GET DIAGNOSTICS
+                 :SQL_IO_ERROR.SQLCNT = ROW_COUNT;
+
+          exec sql GET DIAGNOSTICS CONDITION 1
+               :SQL_IO_ERROR.SQLCDE = DB2_RETURNED_SQLCODE,
+               :SQL_IO_ERROR.SQLSTS = RETURNED_SQLSTATE,
+               :SQL_IO_ERROR.SQLMID = DB2_MESSAGE_ID,
+               :SQL_IO_ERROR.SQLMD1 = DB2_MESSAGE_ID1,
+               :SQL_IO_ERROR.SQLMD2 = DB2_MESSAGE_ID2 ,
+               :SQL_IO_ERROR.SQLMLG = MESSAGE_LENGTH,
+               :SQL_IO_ERROR.SQLMTX = MESSAGE_TEXT;
+
+        RETURN Log_Return_Code;
+
+     end-proc;
+ 

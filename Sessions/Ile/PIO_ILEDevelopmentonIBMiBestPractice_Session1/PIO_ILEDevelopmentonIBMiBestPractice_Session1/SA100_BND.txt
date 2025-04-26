@@ -1,0 +1,30 @@
+ /*------------------------------------------------------------------*/
+ /*                                                                  */
+ /* DESIGNED BY: Hiram Hubbard                                       */
+ /*                                                                  */
+ /*     Program: SA100_BND  BNDSRC                                   */
+ /*                                                                  */
+ /* Service Pgm: SAR100S -  SA Sales Analysis YTD Service Program    */
+ /*                                                                  */
+ /*    Function: Use to control service program signature            */
+ /********************************************************************/
+ /* (C) Copyright VCCI. 2017                                         */
+ /* All rights reserved.                                             */
+ /*                                                                  */
+ /* Licensed Materials - Property of VCCI                            */
+ /********************************************************************/
+ /********************************************************************/
+ /*    Date    Initials  Mod ID      Description                     */
+ /*  --------  --------  --------    ------------------------------- */
+ /*  1/24/2017 HLH                   Initial Write                   */
+ /********************************************************************/
+
+             StrPgmExp  PgmLvl(*Current) Signature('MOD2017v1m001')
+
+                ExPort     SymBol('sAGetYTDSalesData')
+                ExPort     SymBol('sAGetResultSetLocatorPointer')
+                ExPort     SymBol('sALoadDataintoDS')
+                ExPort     SymBol('sAGetIOSqlError')
+
+             EndPgmExp
+ 

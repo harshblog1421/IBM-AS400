@@ -1,0 +1,113 @@
+**Free
+
+   ctl-opt NOMAIN
+           OPTION(*SRCSTMT:*NODEBUGIO);
+
+   //*---------------------------------------------------------------*
+   //*  THIS MATERIAL IS LICENSED BY VISION-C CONSULTING INC (VCCI)  *
+   //*---------------------------------------------------------------*
+   //*                                                               *
+   //* DESIGNED BY: Hiram Hubbard                                    *
+   //*              Chief Development Officer                        *
+   //*  PROGRAM ID: SAR101M.*MODULE                                  *
+   //*                                                               *
+   //* This *Module is as an example to show how load data from      *
+   //*     SQL stored procedure (DAL) to RPGLE from MDS              *
+   //*     (Example Only)                                            *
+   //*                                                               *
+   //* Licensed Materials - Property of VCCI,  All rights reserved   *
+   //*****************************************************************
+   //* Compile Instructions                                          *
+   //*---------------------------------------------------------------*
+   //* After compiling this module, need to update service program   *
+   //*                                                               *
+   //*  UPDSRVPGM SRVPGM(SAR100S)                                    *
+   //*     MODULE(SAR100M SAR101M SAR102M)                           *
+   //*     EXPORT(*SRCFILE)                                          *
+   //*     SRCFILE(QSRVSRC)                                          *
+   //*     SRCMBR(SA100_BND)                                         *
+   //*     ACTGRP(SALISTAG)                                          *
+   //*                                                               *
+   //*****************************************************************
+   //*  CONTROL #   INIT  DATE   DESCRIBE BASIC CHANGE               *
+   //* ***********  ***  ******  *************************************
+   //*              HLH 10/24/17 Initial Write                       *
+   //*****************************************************************
+
+   //*-------------------------------------------------------------*
+   //* Prototype and Interface Section                             *
+   //*-------------------------------------------------------------*
+      /copy sar100p
+
+   //*-------------------------------------------------------------*
+   //*    Data Stucture: Definition                                *
+   //*-------------------------------------------------------------*
+       dcl-ds MOD_SAS101_MDS extname('SAS101DS') TEMPLATE Qualified;
+       end-ds MOD_SAS101_MDS;
+
+       dcl-ds MOD_SAS100_DS extname('SAS100DS') TEMPLATE Qualified;
+       end-ds MOD_SAS100_DS;
+
+   //*-------------------------------------------------------------*
+   //* Program Information Data structure                          *
+   //*-------------------------------------------------------------*
+      /copy ITRPSDS
+
+   //*-------------------------------------------------------------*
+   //*    Global Variables and Working Storage Definition          *
+   //*-------------------------------------------------------------*
+       dcl-s v_Return_Code         CHAR(1);
+       dcl-s v_SQLNRows            INT(5);
+       dcl-s v_Pointer             SQLTYPE(Result_Set_Locator);
+
+   //*-------------------------------------------------------------*
+   //*    Global Constrants Definition                             *
+   //*-------------------------------------------------------------*
+
+   //*-------------------------------------------------------------*
+   //*  Program Entry *Main - NO Main Line Section                 *
+   //*-------------------------------------------------------------*
+          exec sql
+            Set Option COMMIT    = *NONE,
+                       USRPRF    = *OWNER,
+                       DYNUSRPRF = *OWNER,
+                       DATFMT    = *ISO,
+                       DLYPRP    = *YES,
+                       NAMING    = *SYS,
+                       SQLPATH   = *LIBL,
+                       CLOSQLCSR = *ENDACTGRP;
+
+   //*------------------------------------------------------------*
+   //*  Procedure: sALoadDataintoDS                               *
+   //*    Purpose: Load all data from SQL SP into DS and return   *
+   //*------------------------------------------------------------*
+       dcl-proc sALoadDataintoDS Export;
+
+           dcl-pi  *n LIKE(v_Return_Code);
+              i_Pointer            LIKE(v_Pointer);
+              SQL_SAS101_MDS       LIKEDS(MOD_SAS101_MDS) DIM(31766);
+              SQL_SAS100_DS        LIKEDS(MOD_SAS100_DS);
+           end-pi;
+
+           dcl-s i_Return_Code     LIKE(v_Return_Code);
+           dcl-s i_SQLNRows        LIKE(v_SQLNRows) inz(31766);
+
+           Clear SQL_SAS101_MDS;
+
+         //* Declare & Open SQL Cursor from Stored Procedure Result Set
+         exec sql
+              allocate i_SQL_Cursor cursor for result set :i_Pointer;
+
+         //* load all record to the Data Stucture Array.
+         exec sql fetch first from i_SQL_Cursor for :i_SQLNRows rows into
+              :SQL_SAS101_MDS;
+
+         i_Return_Code = sAGetIOSqlError(SQL_SAS100_DS);
+
+        //* Close cursor
+        exec sql close i_SQL_Cursor;
+
+        Return i_Return_Code;
+
+       end-proc;
+ 

@@ -1,0 +1,173 @@
+
+         ctl-opt DFTACTGRP(*NO) ACTGRP(*CALLER)
+         ALWNULL(*USRCTL) OPTIMIZE(*FULL);
+
+      *---------------------------------------------------------------*
+      *                                                               *
+      *  THIS MATERIAL IS LICENSED BY VISION-C CONSULTING INC (VCCI)  *
+      *                                                               *
+      *---------------------------------------------------------------*
+      *                                                               *
+      *  PROGRAM ID: ITBUY02FRE.SQLRPGLE                              *
+      *                                                               *
+      *         DSC: Example of Subfile using SQL to Get data         *
+      *              total free format                                *
+      *****************************************************************
+      *  CONTROL #   INIT  DATE   DESCRIBE BASIC CHANGE               *
+      * ***********  ***  ******  *************************************
+      *              HLH 06/25/14 Initial Write                       *
+      *                                                               *
+      *****************************************************************
+
+       dcl-f ITBUYFM workstn
+             indds(INDS)
+             sfile(SUBFILE:SubFile_RRN);
+
+      //*--------------------------------------------------------------*
+      //*    Data Stucture: Definition                                 *
+      //*--------------------------------------------------------------*
+
+       dcl-ds TBLBYR_MDS   DIM(256) Qualified;
+              Buyer_Code   Char(3);
+              Buyer_Name   Char(20);
+       end-ds TBLBYR_MDS;
+
+      //*--------------------------------------------------------------*
+      //* Name Indicator Data Stucture for Display-Workstation         *
+      //*--------------------------------------------------------------*
+
+       dcl-ds Inds;
+              Exit_Key            IND pos(3);
+              End_program         IND pos(12);
+              Bottom              IND pos(94);
+              Clear_Out_Subfile   IND pos(98);
+       end-ds Inds;
+
+      //*--------------------------------------------------------------*
+      //*    Global Variables and Working Storage Definition           *
+      //*--------------------------------------------------------------*
+
+       dcl-s SubFile_RRN     PACKED(5) inz(0);
+       dcl-s v_SQLNRows      INT(5)    inz(256);
+       dcl-s v_Record_index  PACKED(5);
+
+      //*--------------------------------------------------------------*
+      //*  Program Entry *Main - Main Line Section                     *
+      //*--------------------------------------------------------------*
+
+           exec sql  Set Option
+                     COMMIT    = *NONE,  DYNUSRPRF = *OWNER,
+                     DATFMT    = *ISO,   DLYPRP    = *YES,
+                     CLOSQLCSR = *ENDACTGRP;
+
+           Housekeeping();
+           Display();
+           Shut_Down_Program();
+
+           Return;
+
+       //*-------------------------------------------------------------*
+       //*  Procedure: HouseKeeping                                    *
+       //*    Purpose: Program initialization once each cycle          *
+       //*-------------------------------------------------------------*
+
+       dcl-proc Housekeeping;
+
+           Get_Data();
+           Load_Subfile();
+
+       end-proc Housekeeping;
+
+       //*-------------------------------------------------------------*
+       //*  Procedure: DISPLAY                                         *
+       //*    Purpose: Control the Screen Display Loop until exit      *
+       //*-------------------------------------------------------------*
+
+       dcl-proc Display;
+
+           Write HEADER;
+
+           Dou Exit_Key or End_Program;
+
+             If Subfile_RRN = *zeros;
+               Exfmt NOTFND;
+             Else;
+               Exfmt SUBCTL;
+             Endif;
+
+           Enddo;
+
+       end-proc Display;
+
+       //*-------------------------------------------------------------*
+       //*  Procedure: Get_Data                                        *
+       //*    Purpose: Run SQL Select to Get the data & load into MDS  *
+       //*-------------------------------------------------------------*
+
+       dcl-proc Get_Data;
+
+            exec sql declare cursor_1 scroll cursor for
+                 select BYRNUM, BYRNAM from TBLBYR for fetch only;
+
+            exec sql open cursor_1;
+            exec sql fetch first from cursor_1 for :v_SQLNRows rows into
+                 :TBLBYR_MDS;
+
+       end-proc Get_Data;
+
+       //*-------------------------------------------------------------*
+       //*  Procedure: Load_Subfile                                    *
+       //*    Purpose: Load all records to the subfile using MDS       *
+       //*-------------------------------------------------------------*
+
+       dcl-proc Load_Subfile;
+
+            Dou Bottom;
+
+               For v_Record_index  = 1 to v_SQLNrows;
+                If TBLBYR_MDS(v_Record_Index).buyer_code = *Blanks;
+                   Leave;
+                Endif;
+
+                @CDE = TBLBYR_MDS(v_Record_Index).Buyer_code;
+                @DES = TBLBYR_MDS(v_Record_Index).Buyer_name;
+
+                Subfile_RRN += 1;
+                Write SUBFILE;
+              Endfor;
+                Bottom = *on;
+                Leave;
+            Enddo;
+
+       end-proc Load_Subfile;
+
+
+       //*-------------------------------------------------------------*
+       //*  Procedure: Subfile_Clear                                   *
+       //*    Purpose: Clear all records from the subfile              *
+       //*-------------------------------------------------------------*
+
+       dcl-proc Subfile_Clear;
+
+            Subfile_RRN       = *zeros;
+            Clear_Out_Subfile = *on;
+            Write SUBCTL;
+            Clear_Out_Subfile = *off;
+
+       end-proc Subfile_Clear;
+
+
+       //*-------------------------------------------------------------*
+       //*  Procedure: Shut_Down_Program                               *
+       //*    Purpose: Shutdown program & return to the caller         *
+       //*-------------------------------------------------------------*
+
+       dcl-proc Shut_Down_Program;
+
+           clear TBLBYR_MDS;
+
+           Exec sql close cursor_1;
+           Subfile_Clear();
+
+       end-proc Shut_Down_Program;
+ 

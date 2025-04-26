@@ -1,0 +1,81 @@
+**Free
+
+  /If Not Defined (SAR100P)
+  /Define SAR100P
+
+    //*---------------------------------------------------------------*
+    //*  THIS MATERIAL IS LICENSED BY VISION-C CONSULTING INC (VCCI)  *
+    //*---------------------------------------------------------------*
+    //*                                                               *
+    //* DESIGNED BY: Hiram Hubbard                                    *
+    //*              Chief Development Officer                        *
+    //*  PROGRAM ID: SAR100P.RPGLE                                    *
+    //*                                                               *
+    //*         DSC: Main Prototype Source Member Copybook for Modules*
+    //*              (SAR100M, SAR101M and SAR102M) Example only      *
+    //* Licensed Materials - Property of VCCI,  All rights reserved   *
+    //*****************************************************************
+    //*  CONTROL #   INIT  DATE   DESCRIBE BASIC CHANGE               *
+    //* ***********  ***  ******  *************************************
+    //*              HLH 10/24/17 Initial Write                       *
+    //*****************************************************************
+
+    //*-------------------------------------------------------------*
+    //*    Data Stucture: Definition                                *
+    //*-------------------------------------------------------------*
+       dcl-ds PRO_SAS101_MDS extname('SAS101DS') TEMPLATE Qualified;
+       end-ds PRO_SAS101_MDS;
+
+       dcl-ds PRO_SAS100_DS extname('SAS100DS') TEMPLATE Qualified;
+       end-ds PRO_SAS100_DS;
+
+    //*-------------------------------------------------------------*
+    //*    Global Variables and Working Storage Definition          *
+    //*-------------------------------------------------------------*
+       dcl-s  z_Return_Code             CHAR(1);
+       dcl-s  z_SQL_Sales_Country_Code  CHAR(3);
+       dcl-s  z_Pointer                 SQLTYPE(Result_Set_Locator);
+
+    //*-------------------------------------------------------------*
+    //*    Prototype for sAGetYTDSalesData Subprocedure             *
+    //*-------------------------------------------------------------*
+       dcl-pr sAGetYTDSalesData    LIKE(z_Return_Code)
+                        extproc('sAGetYTDSalesData');
+
+              p_SQL_Sales_Country_Code LIKE(z_SQL_Sales_Country_Code);
+              p_SAS101_MDS             LIKEDS(PRO_SAS101_MDS) DIM(31766);
+              p_SAS100_DS              LIKEDS(PRO_SAS100_DS);
+       end-pr;
+
+    //*-------------------------------------------------------------*
+    //*    Prototype for sAGetResultSetLocatorPointer Subprocedure  *
+    //*-------------------------------------------------------------*
+       dcl-pr sAGetResultSetLocatorPointer  LIKE(z_Return_Code)
+                        extproc('sAGetResultSetLocatorPointer');
+
+              p_SAS101_MDS      LIKEDS(PRO_SAS101_MDS) DIM(31766);
+              p_SAS100_DS       LIKEDS(PRO_SAS100_DS);
+       end-pr;
+
+    //*-------------------------------------------------------------*
+    //*    Prototype for sALoadDataintoDS Subprocedure              *
+    //*-------------------------------------------------------------*
+       dcl-pr sALoadDataintoDS  LIKE(z_Return_Code)
+                        extproc('sALoadDataintoDS');
+
+              p_Pointer         LIKE(z_Pointer);
+              p_SAS101_MDS      LIKEDS(PRO_SAS101_MDS) DIM(31766);
+              p_SAS100_DS       LIKEDS(PRO_SAS100_DS);
+       end-pr;
+
+    //*-------------------------------------------------------------*
+    //*    Prototype for sAGetIOSqlError Subprocedure               *
+    //*-------------------------------------------------------------*
+       dcl-pr sAGetIOSqlError  LIKE(z_Return_Code)
+                        extproc('sAGetIOSqlError');
+
+              p_SAS100_DS      LIKEDS(PRO_SAS100_DS);
+       end-pr;
+
+  /EndIf
+ 

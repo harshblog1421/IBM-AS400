@@ -1,0 +1,26 @@
+
+-- *--------------------------------------------------------------*
+-- *   THIS MATERIAL IS LICENSED VISION-C CONSULTING INC. (VCCI)  *
+-- *--------------------------------------------------------------*
+-- *     DESIGNED BY: Hiram Hubbard                               *
+-- *                                                              *
+-- *   Specific Name: INDEX_1                                    *
+-- *                                                              *
+-- * Purpose: Example Only Index for with Large page Size         *
+-- *                                                              *
+-- ****************************************************************
+-- *                      Mod ID                                  *
+-- *    Date    Initials  Number      Description                 *
+-- *  --------  --------  --------    --------------------------- *
+-- * 11/12/2022 HLH                   Initial Write               *
+-- ****************************************************************
+
+CREATE INDEX INDEX_1
+ ON TABLE_A ( FIELDA)
+
+ PAGESIZE(128);
+
+
+LABEL ON INDEX  INDEX_1
+  IS 'SQL Index with Large Page Size for Performance MTI USE ' ;
+                                                        

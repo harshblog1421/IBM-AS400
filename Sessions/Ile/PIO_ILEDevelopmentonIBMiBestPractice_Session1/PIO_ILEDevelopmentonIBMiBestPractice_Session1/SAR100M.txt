@@ -1,0 +1,144 @@
+**Free
+
+   ctl-opt NOMAIN
+           OPTION(*SRCSTMT:*NODEBUGIO);
+
+   //*---------------------------------------------------------------*
+   //*  THIS MATERIAL IS LICENSED BY VISION-C CONSULTING INC (VCCI)  *
+   //*---------------------------------------------------------------*
+   //*                                                               *
+   //* DESIGNED BY: Hiram Hubbard                                    *
+   //*              Chief Development Officer                        *
+   //*  PROGRAM ID: SAR100M.*MODULE                                  *
+   //*                                                               *
+   //* This *Module is as an example to show how to use SQL          *
+   //*     in a subProcedure with DB2 SQL Data Access Layer (DAL)    *
+   //*     (Example Only)                                            *
+   //*                                                               *
+   //* Licensed Materials - Property of VCCI,  All rights reserved   *
+   //*****************************************************************
+   //* Compile Instructions                                          *
+   //*---------------------------------------------------------------*
+   //* After compiling this module, need to update service program   *
+   //*                                                               *
+   //*  UPDSRVPGM SRVPGM(SAR100S)                                    *
+   //*     MODULE(SAR100M SAR101M SAR102M)                           *
+   //*     EXPORT(*SRCFILE)                                          *
+   //*     SRCFILE(QSRVSRC)                                          *
+   //*     SRCMBR(SA100_BND)                                         *
+   //*     ACTGRP(SALISTAG)                                          *
+   //*                                                               *
+   //*****************************************************************
+   //*  CONTROL #   INIT  DATE   DESCRIBE BASIC CHANGE               *
+   //* ***********  ***  ******  *************************************
+   //*              HLH 10/24/17 Initial Write                       *
+   //*****************************************************************
+
+   //*-------------------------------------------------------------*
+   //* Prototype and Interface Section                             *
+   //*-------------------------------------------------------------*
+      /copy sar100p
+
+   //*-------------------------------------------------------------*
+   //*    Data Stucture: Definition                                *
+   //*-------------------------------------------------------------*
+       dcl-ds MOD_SAS101M_MDS extname('SAS101DS') TEMPLATE Qualified;
+       end-ds MOD_SAS101M_MDS;
+
+       dcl-ds MOD_SAS100_DS extname('SAS100DS') TEMPLATE Qualified;
+       end-ds MOD_SAS100_DS;
+
+   //*-------------------------------------------------------------*
+   //* Program Information Data structure                          *
+   //*-------------------------------------------------------------*
+      /copy ITRPSDS
+
+   //*-------------------------------------------------------------*
+   //*    Global Variables and Working Storage Definition          *
+   //*-------------------------------------------------------------*
+       dcl-s v_Return_Code             CHAR(1);
+       dcl-s v_SQL_Country_Code        CHAR(3);
+       dcl-s v_SQL_Status              PACKED(1);
+       dcl-s v_SQL_Msgid               PACKED(5);
+       dcl-s v_SQL_MsgTxt              Char(70);
+   //* SQL Host variable Pointer
+       dcl-s v_Pointer                 SQLTYPE(Result_Set_Locator);
+
+   //*-------------------------------------------------------------*
+   //*    Global Constrants Definition                             *
+   //*-------------------------------------------------------------*
+       dcl-c c_Error                   Const(1);
+
+   //*-------------------------------------------------------------*
+   //*  Program Entry *Main - NO Main Line Section                 *
+   //*-------------------------------------------------------------*
+          exec sql
+            Set Option COMMIT    = *NONE,
+                       USRPRF    = *OWNER,
+                       DYNUSRPRF = *OWNER,
+                       DATFMT    = *ISO,
+                       DLYPRP    = *YES,
+                       NAMING    = *SYS,
+                       SQLPATH   = *LIBL,
+                       CLOSQLCSR = *ENDACTGRP;
+
+   //*------------------------------------------------------------*
+   //*  Procedure: sAGetYTDSalesData                              *
+   //*    Purpose: Call Stored Procedure to Get data and return   *
+   //*------------------------------------------------------------*
+       dcl-proc sAGetYTDSalesData       Export;
+
+           dcl-pi  *n LIKE(v_Return_Code);
+              i_SQL_Country_Code        LIKE(v_SQL_Country_Code);
+              SQL_SAS101M_MDS           LIKEDS(MOD_SAS101M_MDS) DIM(31766);
+              SQL_SAS100_DS             LIKEDS(MOD_SAS100_DS);
+           end-pi;
+
+           dcl-s i_Return_Code          LIKE(v_Return_Code);
+           dcl-s i_SQL_Status           LIKE(v_SQL_Status);
+           dcl-s i_SQL_Msgid            LIKE(v_SQL_Msgid);
+           dcl-s i_SQL_MsgTxt           LIKE(v_SQL_MsgTxt);
+
+           //* Call Sql Base (DAL) Stored Procedure
+           exec sql call USP_SELECT_YTD_SALES_SAE100BP(:i_SQL_Country_Code,
+                                                       :i_SQL_STATUS,
+                                                       :i_SQL_MSGID,
+                                                       :i_SQL_MSGTXT);
+
+           //* evoke the Load data procedure if no error found
+           IF i_SQL_STATUS <> c_Error;
+
+           i_Return_Code = sAGetResultSetLocatorPointer(SQL_SAS101M_MDS :SQL_SAS100_DS);
+
+           Endif;
+
+           Return i_Return_Code;
+
+       end-proc;
+
+   //*------------------------------------------------------------*
+   //*  Procedure: sAGetResultSetLocatorPointer                   *
+   //*    Purpose: Get Locate Pointer for Result Set data         *
+   //*------------------------------------------------------------*
+
+     dcl-proc sAGetResultSetLocatorPointer            Export ;
+
+       dcl-pi *n       LIKE(v_Return_code);
+              SQL_SAS101M_MDS       LIKEDS(MOD_SAS101M_MDS) DIM(31766);
+              SQL_SAS100_DS         LIKEDS(MOD_SAS100_DS);
+       end-pi;
+
+       dcl-s i_Pointer              LIKE(v_pointer);
+       dcl-s i_Return_Code          LIKE(v_Return_Code);
+
+    //* use a Pointer to Locate and Associate the Result set.
+         exec sql
+              associate result set locators (:i_Pointer)
+                 with procedure USP_SELECT_YTD_SALES_SAE100BP;
+
+         i_Return_Code = sALoadDataintoDS(i_Pointer :SQL_SAS101M_MDS :SQL_SAS100_DS);
+
+        RETURN i_Return_Code;
+
+     end-proc;
+ 

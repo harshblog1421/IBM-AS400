@@ -1,0 +1,2 @@
+-- VCCI Db2 For i SQL Session Training Password
+VCCi@PassW0rd1

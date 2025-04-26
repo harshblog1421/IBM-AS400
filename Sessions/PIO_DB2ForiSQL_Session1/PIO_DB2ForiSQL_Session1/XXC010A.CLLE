@@ -1,0 +1,94 @@
+000100221128 /*------------------------------------------------------------------*/
+000200221128 /*   THIS MATERIAL IS LICENSED BY VISION-C CONSULTING INC. (VCCI)   */
+000300221128 /*------------------------------------------------------------------*/
+000400221128 /* Designed By: Hiram Hubbard                                       */
+000500221128 /*                                                                  */
+000600221128 /*     Program: XXC010A.Application Program                         */
+000700221128 /*                                                                  */
+000800221128 /*  Decription: This is a sample program to show how to use QAQQINI */
+000900221128 /*              to do SQL Parallel Index Maintenance with DB2 SMP   */
+001300221128 /*                                                                  */
+001400221128 /*  Example ONLY  (Training)                                        */
+001500221128 /********************************************************************/
+001600221128 /* All rights reserved.                                             */
+001700221128 /*                                                                  */
+001800221128 /* Licensed Materials - Property of VCCI                            */
+001900221128 /********************************************************************/
+002000221128 /********************************************************************/
+002100221128 /*                      Mod ID                                      */
+002200221128 /*    Date    Initials  Number      Description                     */
+002300221128 /*  --------  --------  --------    ------------------------------- */
+002400221128 /* 01/2021     HLH                  Initial Write                   */
+002500221128 /********************************************************************/
+003300000000 /********************************************************************/
+003400000000
+003500220105             PGM        PARM(&STARTRRN &ENDRRN &FLAG)
+003600000000
+003700000000 /* work variables for message handling */
+003800000000             DCL        VAR(&MSGDTA) TYPE(*CHAR) LEN(256) VALUE(' ')
+003900000000             DCL        VAR(&MSGF) TYPE(*CHAR) LEN(10) VALUE(' ')
+004000000000             DCL        VAR(&MSGFLIB) TYPE(*CHAR) LEN(10) VALUE(' ')
+004100000000             DCL        VAR(&MSGID) TYPE(*CHAR) LEN(7) VALUE(' ')
+004200000000
+004300000000 /* program work variables  */
+004400000000             DCL        VAR(&EOCS) TYPE(*LGL) VALUE('0')
+004500220105             DCL        VAR(&STARTRRN) TYPE(*DEC) LEN(15 5)
+004600220105             DCL        VAR(&ENDRRN) TYPE(*DEC) LEN(15 5)
+004700220105             DCL        VAR(&FLAG) TYPE(*CHAR) LEN(1)
+004800000000
+004900000000 /* set compile activation group                                     */
+005000220110             DCLPRCOPT  DFTACTGRP(*NO) ACTGRP(UTSTATUS)
+005100000000
+005200000000 /* program-level monitor message */
+005300000000             MONMSG     MSGID(CPF9999) EXEC(GOTO CMDLBL(ERROR))
+005400000000
+005500000000 /* Turn on logging               */
+005600000000             CHGJOB     LOG(4 00 *SECLVL) LOGCLPGM(*YES)
+005700000000
+005800000000             CRTDUPOBJ  OBJ(QAQQINI) FROMLIB(QSYS) OBJTYPE(*FILE) +
+005900000000                          TOLIB(QTEMP) DATA(*YES) TRG(*YES)
+006000000000             MONMSG     MSGID(CPF2130)
+006100000000
+006200210929 /* Set DB2 SMP - Processing       */
+006300000000             RUNSQL     SQL('UPDATE QTEMP/QAQQINI SET QQVAL =     +
+006400000000                          ''*OPTIMIZE'' WHERE QQPARM =            +
+006500000000                          ''PARALLEL_DEGREE''') COMMIT(*NONE)
+006600000000
+006700000000             CHGQRYA    QRYOPTLIB(QTEMP)
+006800000000
+006900221128 /* Execute your update Program                                        */
+007000221128             CALL       PGM(XXR010A) PARM(&STARTRRN &ENDRRN)
+007100000000
+007600220105
+007700000000             RETURN
+007800000000
+007900000000 ERROR:
+008000000000             CALLSUBR   SUBR(GLOBAL_ERR)
+008100000000 /*------------------------------------------------------------------*/
+008200000000 /* Subroutine GLOBAL_ERR: Program Level MONMSG detected             */
+008300000000 /*------------------------------------------------------------------*/
+008400000000             SUBR       GLOBAL_ERR
+008500000000
+008600000000                DoWhile    COND( *NOT &EOCS)
+008700000000                   RCVMSG     RMV(*YES) MSGDTA(&MSGDTA) MSGID(&MSGID) +
+008800000000                                MSGF(&MSGF) MSGFLIB(&MSGFLIB)
+008900000000                   MONMSG     MSGID(CPF9999) EXEC(LEAVE)
+009000000000
+009100000000 /* Check if no more messages */
+009200000000                   IF         COND(&MSGID = ' ') THEN(LEAVE)
+009300000000
+009400000000                   SNDPGMMSG  MSGID(&MSGID) MSGF(&MSGFLIB/&MSGF) +
+009500000000                                MSGDTA(&MSGDTA) MSGTYPE(*DIAG)
+009600000000                   MONMSG     MSGID(CPF9999) EXEC(LEAVE)
+009700000000
+009800000000                Enddo
+009900000000
+010000000000 /* Unexpected Function check found send messages to user  */
+010100000000                SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA('Procrdure +
+010200000000                             ended in error. See previously listed +
+010300000000                             messages') MSGTYPE(*COMP)
+010400000000
+010500000000             ENDSUBR
+010600000000
+010700000000             ENDPGM
+010800000000

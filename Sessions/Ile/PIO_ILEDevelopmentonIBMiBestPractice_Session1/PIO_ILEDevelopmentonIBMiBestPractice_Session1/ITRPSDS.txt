@@ -1,0 +1,66 @@
+**Free
+
+     //------------------------------------------------------------------*
+     //   THIS MATERIAL IS LICENSED BY VISION-C CONSULTING (VCCI)        *
+     //------------------------------------------------------------------*
+     // Designed By: Hiram Hubbard                                       *
+     //              Chief Development Officer                           *
+     //                                                                  *
+     //     Program: ITRPSDS.RPGLE                                       *
+     //                                                                  *
+     //    Function: Program Information Data Structure Copybook         *
+     //*******************************************************************
+     // (C) Copyright VCCI. 2016                                         *
+     // All rights reserved.                                             *
+     //                                                                  *
+     // Licensed Materials - Property of VCCI                            *
+     //*******************************************************************
+     //*******************************************************************
+     //                      Mod ID                                      *
+     //    Date    Initials  Number      Description                     *
+     //  --------  --------  --------    ------------------------------- *
+     // 08/01/2016  HLH                  Initial Write                   *
+     //*******************************************************************
+
+      //*----------------------------------------------------------------*
+      //*    Data Stucture: Definition                                   *
+      //*----------------------------------------------------------------*
+
+       DCL-DS ITRPSDS_Program_DS  PSDS;
+            P#_Main_Procedure   *PROC;
+            P#_Status           *STATUS;
+            P#_Previous_Status  ZONED(5)  POS(16);
+            P#_Line_Number      CHAR(8)   POS(21);
+            P#_Routine          *ROUTINE;
+            P#_Parameters       *PARMS;
+            P#_Exception_Type   CHAR(3)   POS(40);
+            P#_Exception_Number CHAR(4)   POS(43);
+            P#_Msg_Work_Area    CHAR(30)  POS(51);
+            P#_Pgm_library      CHAR(10)  POS(81);
+            P#_Exception_Data   CHAR(80)  POS(91);
+            P#_Exception_ID     CHAR(4)   POS(171);
+            P#_Name_Of_File     CHAR(10)  POS(175);
+            P#_Job_Start_Date   CHAR(8)   POS(191);
+            P#_Year             ZONED(2)  POS(199);
+            P#_Last_File_Use    CHAR(8)   POS(201);
+            P#_Status_Infor     CHAR(35)  POS(209);
+            P#_Job_Name         CHAR(10)  POS(244);
+            P#_User_ID          CHAR(10)  POS(254);
+            P#_Job_Number       ZONED(6)  POS(264);
+            P#_Pgm_Start_Date   ZONED(6)  POS(270);
+            P#_Pgm_Run_Date     ZONED(6)  POS(276);
+            P#_Time             ZONED(6)  POS(282);
+            P#_UDate            CHAR(6)   POS(282);
+            P#_Pgm_Compile_Time CHAR(6)   POS(294);
+            P#_Level_Compiler   CHAR(4)   POS(300);
+            P#_Source_File      CHAR(10)  POS(304);
+            P#_Source_Library   CHAR(10)  POS(314);
+            P#_Source_Member    CHAR(10)  POS(324);
+            P#_PgmID            CHAR(10)  POS(334);
+            P#_Module_Name      CHAR(10)  POS(344);
+            P#_Source_ID1       BINDEC(2) POS(354);
+            P#_Source_ID2       BINDEC(2) POS(356);
+            P#_Current_UserID   CHAR(10)  POS(358);
+            P#_External_Error   INT(10)   POS(368);
+            P#_XML_Elements     INT(20)   POS(372);
+       END-DS; 

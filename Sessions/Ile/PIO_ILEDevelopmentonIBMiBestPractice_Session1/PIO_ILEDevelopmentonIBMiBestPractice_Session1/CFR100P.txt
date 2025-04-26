@@ -1,0 +1,164 @@
+**Free
+
+/If Not Defined (CFR100P)
+/Define CFR100P
+
+//---------------------------------------------------------------*
+//                                                               *
+//  THIS MATERIAL IS LICENSED BY VISION-C CONSULTING INC. (VCCI) *
+//                                                               *
+//---------------------------------------------------------------*
+//                                                               *
+//  PROGRAM ID: CFR100P.RPGLE                                    *
+//                                                               *
+// DESCRIPTION: Prototype Source Member Copybook                 *
+//---------------------------------------------------------------*
+// Property of VCCI                                              *
+//****************************************************************
+//  MOD ID      INIT  DATE   DESCRIBE BASIC CHANGE               *
+// ***********  ***  ******  *************************************
+//              HLH  1/20/20 Initial Write                       *
+//****************************************************************
+
+//---------------------------------------------------------------*
+//    Global Variables and Working Storage Definition            *
+//---------------------------------------------------------------*
+ Dcl-S gv_Confirm Char(1);
+ Dcl-S gv_PgmQ Char(10);
+ Dcl-S gv_MsgFile Char(10);
+ Dcl-S gv_MsgLibrary Char(10);
+ Dcl-S gv_MsgID Char(7);
+ Dcl-S gv_MsgText Char(80);
+ Dcl-S gv_MsgSub Char(60);
+ Dcl-S gv_UserPrf Char(10);
+ Dcl-S gv_HostName Char(10);
+ Dcl-S gv_eMailAddress Char(50);
+ Dcl-S gv_Password Char(128);
+ Dcl-S gv_SQLStatus Packed(1);
+ Dcl-S gv_SQLMsgid Packed(5);
+ Dcl-S gv_SQLMsgTxt Char(70);
+ Dcl-S gv_Return Char(1);
+
+//---------------------------------------------------------------*
+// Prototype for cFConfirmationProcess, Confirm Transaction      *
+// confirmation                                                  *
+//---------------------------------------------------------------*
+ Dcl-PR cFConfirmationProcess Ind ExtProc('cFConfirmationProcess');
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCallConfirmationProcess, Call Program         *
+//---------------------------------------------------------------*
+ Dcl-PR cFCallConfirmationProcess ExtPgm('CFC101A');
+  p_Confirm Like(gv_Confirm);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFClearMessageQueue, Clear Pgm Message Queue    *
+//---------------------------------------------------------------*
+ Dcl-PR cFClearMessageQueue ExtProc('cFClearMessageQueue');
+  p_PgmQ Like(gv_PgmQ);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCallConfirmationProcess, Call Program         *
+//---------------------------------------------------------------*
+ Dcl-PR cFCallClearMessageQueue ExtPgm('CFC102A');
+  p_PgmQ Like(gv_PgmQ);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFRetrieveMessage, Retrieve Message             *
+//---------------------------------------------------------------*
+ Dcl-PR cFRetrieveMessage ExtProc('cFRetrieveMessage');
+  p_PgmQ Like(gv_PgmQ) Const;
+  p_MsgFile Like(gv_MsgFile) ConSt;
+  p_MsgLibrary Like(gv_MsgLibrary);
+  p_MsgID Like(gv_MsgID) Const;
+  p_MsgText Like(gv_MsgText);
+  p_MsgSub Like(gv_MsgSub) Const;
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCallRetrieveMessage, Call Program             *
+//---------------------------------------------------------------*
+ Dcl-PR cFCallRetrieveMessage ExtPgm('CFC103A');
+  p_PgmQ Like(gv_PgmQ) Const;
+  p_MsgFile Like(gv_MsgFile) ConSt;
+  p_MsgLibrary Like(gv_MsgLibrary);
+  p_MsgID Like(gv_MsgID) Const;
+  p_MsgText Like(gv_MsgText);
+  p_MsgSub Like(gv_MsgSub) Const;
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFValidateUserProfile                           *
+//---------------------------------------------------------------*
+ Dcl-PR cFValidateUserProfile Ind ExtProc('cFValidateUserProfile');
+  p_UserPrf Like(gv_UserPrf) Const;
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCheckUserProfile                              *
+//---------------------------------------------------------------*
+ Dcl-PR cFCheckUserProfile Char(1) ExtProc('cFCheckUserProfile');
+  p_UserPrf Like(gv_UserPrf);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCheckUserProfileValidation                    *
+//---------------------------------------------------------------*
+ Dcl-PR cFCheckUserProfileValidation ExtPgm('CFC105A');
+  p_UserPrf Like(gv_UserPrf);
+  p_Return Like(gv_Return);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCheckHostByName                               *
+//---------------------------------------------------------------*
+ Dcl-PR cFCheckHostByName Char(1) ExtProc('cFCheckHostByName');
+  p_HostName Like(gv_HostName);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCheckHostByNameValidation                     *
+//---------------------------------------------------------------*
+ Dcl-PR cFCheckHostByNameValidation ExtPgm('CFC104A');
+  p_HostName Like(gv_HostName);
+  p_Return Like(gv_Return);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCheckeMailAddress                             *
+// Email Validation in Module CFR100M                            *
+//---------------------------------------------------------------*
+ Dcl-PR cFCheckeMailAddress Char(1) ExtProc('cFCheckeMailAddress');
+  p_eMailAddress Like(gv_eMailAddress);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFGetSystemName                                 *
+// Email Validation in Module CFR100M                            *
+//---------------------------------------------------------------*
+ Dcl-PR cFGetSystemName Char(10) ExtProc('cFGetSystemName');
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFCheckPassword                                 *
+// Password Validation in Module CFR100M                         *
+//---------------------------------------------------------------*
+ Dcl-PR cFCheckPassword Char(1) ExtProc('cFCheckPassword');
+  p_Passwords Like(gv_Password);
+ End-PR;
+
+//---------------------------------------------------------------*
+// Prototype for cFClearMessageFields                            *
+// Clear message fields                                          *
+//---------------------------------------------------------------*
+ Dcl-PR cFClearMessageFields ExtProc('cFClearMessageFields');
+  p_SQLStatus Like(gv_SQLStatus);
+  p_SQLMsgid Like(gv_SQLMsgid);
+  p_SQLMsgTxt Like(gv_SQLMsgTxt);
+ End-PR;
+
+/EndIf 

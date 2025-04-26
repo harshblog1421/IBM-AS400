@@ -1,0 +1,200 @@
+**Free
+
+   ctl-opt DFTACTGRP(*NO) ACTGRP('SALISTAG')
+       ALWNULL(*USRCTL) BNDDIR('WITBNDDIR') OPTION(*SRCSTMT:*NODEBUGIO);
+
+    //*---------------------------------------------------------------*
+    //*  THIS MATERIAL IS LICENSED BY VISION-C CONSULTING INC (VCCI)  *
+    //*---------------------------------------------------------------*
+    //*                                                               *
+    //* DESIGNED BY: Hiram Hubbard                                    *
+    //*              Chief Development Officer                        *
+    //*  PROGRAM ID: SAR100A.RPGLE                                    *
+    //*                                                               *
+    //*         DSC: ILE example version of Subfile using Export Proc *
+    //*              to get the data in total free format             *
+    //*                                                               *
+    //* Licensed Materials - Property of VCCI,  All rights reserved   *
+    //*****************************************************************
+    //*    MOD NO    INIT  DATE   DESCRIBE BASIC CHANGE               *
+    //* ***********  ***  ******  *************************************
+    //*              HLH 10/24/17 Initial Write                       *
+    //*****************************************************************
+
+       dcl-f SAD100FM workstn
+             indds(INDS)
+             sfile(SUBFILE:SubFile_RRN);
+
+      //*-------------------------------------------------------------*
+      //* Prototype and Interface Section                             *
+      //*-------------------------------------------------------------*
+        /copy sar100p
+
+      //*-------------------------------------------------------------*
+      //*    Prototype for this program *Main Entry Point SAR100A     *
+      //*-------------------------------------------------------------*
+       dcl-pi SAR100A;
+             p_Country_Code    CHAR(3) ;
+       end-pi;
+
+      //*-------------------------------------------------------------*
+      //*    Data Stucture: Definition                                *
+      //*-------------------------------------------------------------*
+       dcl-ds SAS101_MDS extname('SAS101DS') DIM(31766) Qualified;
+       end-ds SAS101_MDS;
+
+       dcl-ds SAS100_DS extname('SAS100DS') Qualified;
+       end-ds SAS100_DS;
+
+      //*-------------------------------------------------------------*
+      //* Program Information Data structure                          *
+      //*-------------------------------------------------------------*
+        /copy ITRPSDS
+
+      //*-------------------------------------------------------------*
+      //* Name Indicator Data Stucture for Display-Workstation        *
+      //*-------------------------------------------------------------*
+       dcl-ds Inds;
+              Exit_Key            IND POS(3);
+              End_program_Key     IND POS(12);
+              Bottom              IND POS(94);
+              Clear_Out_Subfile   IND POS(98);
+       end-ds Inds;
+
+      //*-------------------------------------------------------------*
+      //*    Global Variables and Working Storage Definition          *
+      //*-------------------------------------------------------------*
+       dcl-s Subfile_RRN        PACKED(5)  inz(0);
+       dcl-s v_SQLNRows         INT(5)     inz(31766);
+       dcl-s v_Record_index     PACKED(5);
+       dcl-s v_Cty_code_Default CHAR(3)    inz('USA');
+       dcl-s v_NoMoreRecords    PACKED(4)  inz(0);
+       dcl-s v_NO               CHAR(1)    inz('N');
+
+      //*-------------------------------------------------------------*
+      //*  Program Entry *Main - Main Line Section                    *
+      //*-------------------------------------------------------------*
+           HouseKeeping();
+
+           Display();
+
+           ShutDownProgram();
+
+           Return;
+
+       //*------------------------------------------------------------*
+       //*  Procedure: HouseKeeping                                   *
+       //*    Purpose: Program initialization once each cycle         *
+       //*------------------------------------------------------------*
+       dcl-proc HouseKeeping;
+
+       // set default if needed
+           If p_Country_Code = *Blanks;
+              p_Country_Code = v_Cty_Code_default;
+           endif;
+
+           @ACTRYCD =  p_Country_Code;
+
+           GetData(p_Country_Code);
+
+           LoadSubFile();
+
+           Return;
+
+       end-proc HouseKeeping;
+
+       //*------------------------------------------------------------*
+       //*  Procedure: DISPLAY                                        *
+       //*    Purpose: Control the Screen Display Loop until exit     *
+       //*------------------------------------------------------------*
+       dcl-proc Display;
+
+
+           Dou Exit_Key or End_Program_Key;
+
+             If Subfile_RRN   = *zeros;
+                Exfmt NOTFND;
+             Else;
+                Write HEADER;
+                Exfmt SUBCTL;
+             Endif;
+
+           Enddo;
+
+       end-proc Display;
+
+       //*------------------------------------------------------------*
+       //*  Procedure: GetData                                        *
+       //*    Purpose: call Export sub-procedure to get the data      *
+       //*               based on the Input Parms                     *
+       //*------------------------------------------------------------*
+       dcl-proc GetData;
+
+         dcl-pi *n ;
+              i_Country_Code  LIKE(SAS101_MDS.SACTRYCD);
+         end-pi;
+
+          // Did the procedure run correctly
+         If sAGetYTDSalesData(i_Country_code :SAS101_MDS :SAS100_DS) = v_NO;
+
+            // Do something with an error //
+
+         Endif;
+
+       end-proc GetData;
+
+       //*------------------------------------------------------------*
+       //*  Procedure: LoadSubfile                                    *
+       //*    Purpose: Load all records to the subfile using MDS      *
+       //*------------------------------------------------------------*
+       dcl-proc LoadSubfile;
+
+            Dou Bottom;
+
+              For v_Record_index  = 1 to v_SQLNrows;
+                If SAS101_MDS(v_Record_Index).SASALMID = v_NoMoreRecords;
+                   Leave;
+                Endif;
+
+                @ASALMID = SAS101_MDS(v_Record_Index).SASALMID;
+                @ASALNM  = SAS101_MDS(v_Record_Index).SASALNM ;
+                @AYTDAMT = SAS101_MDS(v_Record_Index).SAYTDAMT ;
+
+                Subfile_RRN += 1;
+                Write SUBFILE;
+              Endfor;
+                Bottom = *on;
+                Leave;
+            Enddo;
+
+       end-proc LoadSubfile;
+
+       //*------------------------------------------------------------*
+       //*  Procedure: SubfileClear                                   *
+       //*    Purpose: Clear all records from the subfile             *
+       //*------------------------------------------------------------*
+       dcl-proc SubfileClear;
+
+            Subfile_RRN       = *zeros;
+            Clear_Out_Subfile = *on;
+            Write SUBCTL;
+            Clear_Out_Subfile = *off;
+
+       end-proc SubfileClear;
+
+
+       //*------------------------------------------------------------*
+       //*  Procedure: ShutDownProgram                                *
+       //*    Purpose: Shutdown program & return to the caller        *
+       //*------------------------------------------------------------*
+       dcl-proc ShutDownProgram;
+
+           clear SAS101_MDS;
+           clear SAS100_DS;
+
+           If Subfile_RRN  <> *zeros;
+              SubfileClear();
+           Endif;
+
+       end-proc ShutDownProgram;
+ 

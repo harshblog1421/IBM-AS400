@@ -1,0 +1,21 @@
+
+--    ****************************************************************
+--    *                                                              *
+--    *   Specific Name: CFE105BP.SQL                                *
+--    *                                                              *
+--    *       Developer: HIRAM HUBBARD     Date: 01/24/2020          *
+--    *                                                              *
+--    * Purpose: Command Feature UDF to Verify User Profile          *
+--    *                                                              *
+--    * Mod: 9500.3                                                  *
+--    ****************************************************************
+
+Create Or Replace Function UDF_CHECK_USER_PROFILE_CFE105BP
+ (UserProfile Char(10))
+
+ Returns Char(1)
+ Specific CFE105BP
+ Deterministic
+ Language RPGLE
+ External Name CFR100S(cFCheckUserProfile)
+ Parameter Style General;            

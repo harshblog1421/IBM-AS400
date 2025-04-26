@@ -1,0 +1,243 @@
+**Free
+
+     ctl-opt DFTACTGRP(*NO) ACTGRP('CFUNCTION')
+      ALWNULL(*USRCTL);
+
+    //*---------------------------------------------------------------*
+    //*                                                               *
+    //*  THIS MATERIAL IS LICENSED BY VCCI                            *
+    //*                                                               *
+    //*---------------------------------------------------------------*
+    //* DESIGNED BY: Hiram Hubbard                                    *
+    //*                                                               *
+    //*  PROGRAM ID: CFR151A.SQLRPGLE                                 *
+    //*                                                               *
+    //*         DSC: Common Feature Reference Category Main Subfile   *
+    //*              Pop-up Window application program                *
+    //*                                                               *
+    //*   pROCEDURE: cFMainReferenceCatPopupWindow                    *
+    //*                                                               *
+    //*****************************************************************
+    //*    MOD NO    INIT  DATE   DESCRIBE BASIC CHANGE               *
+    //* ***********  ***  ******  *************************************
+    //*              HLH 04/01/22 Initial Write                       *
+    //*                                                               *
+    //*****************************************************************
+
+     dcl-f CFD151FM workstn
+           indds(INDS)
+           sfile(SUBFILE:SubFile_RRN);
+
+    //*-------------------------------------------------------------*
+    //*    Prototype for this program *Main Entry Point CFR151A     *
+    //*-------------------------------------------------------------*
+
+         dcl-pi CFR151A;
+               i_CAT_Code      CHAR(3);
+               i_CAT_Name      CHAR(50);
+         end-pi;
+
+    //*--------------------------------------------------------------  -*
+    //*    Data Stucture: Definition                                    *
+    //*--------------------------------------------------------------  -*
+      dcl-ds CFS150M_MDS extname('CFS150DS') DIM(3024) Qualified;
+      end-ds CFS150M_MDS;
+
+    //*---------------------------------------------------------------*
+    //*    Global Variables and Working Storage Definition            *
+    //*---------------------------------------------------------------*
+
+      dcl-s SubFile_RRN        PACKED(5)  inz(0);
+      dcl-s v_SQLNRows         INT(5)     inz(3024);
+      dcl-s v_Record_index     PACKED(5);
+
+    //*-------------------------------------------------------------*
+    //* Name Indicator Data Stucture for Display-Workstation        *
+    //*-------------------------------------------------------------*
+     dcl-ds Inds;
+            Exit_Key            IND POS(3);
+            End_Program         IND POS(12);
+            Bottom              IND POS(94);
+            Clear_Subfile       IND POS(98);
+     end-ds Inds;
+
+      //*--------------------------------------------------------------*
+      //*  Program Entry *Main - Main Line Section                     *
+      //*--------------------------------------------------------------*
+
+      //* Set compile option
+         exec sql  Set Option
+                   COMMIT    = *NONE,  DYNUSRPRF = *OWNER,
+                   DATFMT    = *ISO,   DLYPRP    = *YES,
+                   CLOSQLCSR = *ENDACTGRP;
+
+         Housekeeping();
+
+         DoBusinessLogic();
+
+         EndProgram();
+
+         Return;
+
+     //*--------------------------------------------------------------*
+     //*  Procedure: DoBusinessLogic                                  *
+     //*    Purpose: The Business Logic The Main Control Routine      *
+     //*--------------------------------------------------------------*
+
+    dcl-proc  DoBusinessLogic;
+
+     // loop until user hit exit key
+         Dou Exit_Key or End_Program;
+            Display();
+         Enddo;
+
+    end-proc DoBusinessLogic;
+
+     //*--------------------------------------------------------------*
+     //*  Procedure: Subfile_Clear                                    *
+     //*    Purpose: Clear all records from the subfile               *
+     //*--------------------------------------------------------------*
+
+    dcl-proc  Subfile_Clear;
+
+         Subfile_RRN   = *zeros;
+         Clear_Subfile = *on;
+          Write SUBCTL;
+         Clear_Subfile = *off;
+         Bottom        = *on;
+
+    end-proc Subfile_Clear;
+
+     //*--------------------------------------------------------------*
+     //*  Procedure: Load_Subfile                                     *
+     //*    Purpose: Load all records to the subfile using SQL        *
+     //*--------------------------------------------------------------*
+
+     dcl-proc Load_Subfile;
+
+        //* Select all rows
+          exec sql declare cursor_1 scroll cursor for
+               select CFRCAT, CFRKEY, CFRDAT, CFRNAM
+                     From CFS150M
+               Where CFRKEY = '99999'
+               Order By CFRCAT
+                     for fetch only;
+
+          exec sql open cursor_1;
+          exec sql fetch first from cursor_1 for :v_SQLNRows rows into
+               :CFS150M_MDS;
+
+          exec sql close cursor_1;
+
+        //* Add records to the subfile
+          Dou Bottom;
+
+            for v_Record_index  = 1 to v_SQLNrows;
+              If CFS150M_MDS(v_Record_Index).CFRCAT = *Blanks;
+                 Leave;
+              Endif;
+
+              @CAT  = CFS150M_MDS(v_Record_Index).CFRCAT;
+              @NAME = CFS150M_MDS(v_Record_Index).CFRNAM;
+              @NAME1 = CFS150M_MDS(v_Record_Index).CFRNAM;
+
+              Subfile_RRN += 1;
+              Write SUBFILE;
+            Endfor;
+              Bottom = *on;
+              Leave;
+          Enddo;
+
+     end-proc Load_Subfile;
+
+     //*--------------------------------------------------------------*
+     //*  Procedure: DISPLAY                                          *
+     //*    Purpose: Control the Screen Display                       *
+     //*--------------------------------------------------------------*
+
+     dcl-proc Display;
+
+         //* if no records found display NOT FOUND Record Format
+         If Subfile_RRN = *zeros;
+         Else;
+            Write HEADER;
+            Exfmt SUBCTL;
+         Endif;
+
+         Read  HEADER;
+
+       //* Check function key pressed
+         Select;
+           When Exit_Key = *On;
+               Return;
+          When End_program = *On;
+               Return;
+          Other;
+               Enter();
+         ENDSL;
+
+     end-proc Display;
+
+     //*--------------------------------------------------------------*
+     //*  Procedure: ENTER                                            *
+     //*    Purpose: Process the Enter Key                            *
+     //*--------------------------------------------------------------*
+
+     dcl-proc Enter;
+
+        Select_option();
+
+        If Exit_Key = *Off;
+          clear CFS150M_MDS;
+          clear v_Record_index;
+          Subfile_Clear();
+          Load_Subfile();
+        Endif;
+
+    end-proc Enter;
+
+     //*--------------------------------------------------------------*
+     //*  Procedure: Select_Option                                    *
+     //*    Purpose: Check if user selected a option                  *
+     //*--------------------------------------------------------------*
+
+   dcl-proc Select_Option;
+
+       ReadC SUBFILE;
+       If Not %EOF;
+        i_CAT_Code   = @CAT;
+        i_CAT_Name   = @NAME1;
+        @opt         = *BLANK;
+        update SUBFILE;
+          Exit_key = *On;
+       EndIf;
+
+    end-proc Select_Option;
+
+     //*--------------------------------------------------------------*
+     //*  Procedure: HouseKeeping                                     *
+     //*    Purpose: Program initialization once each cycle           *
+     //*--------------------------------------------------------------*
+
+     dcl-proc Housekeeping;
+
+         Load_Subfile();
+
+     end-proc Housekeeping;
+
+     //*--------------------------------------------------------------*
+     //*  Procedure: EndProgram                                       *
+     //*    Purpose: Shut Down the program and reset for next cycle   *
+     //*--------------------------------------------------------------*
+
+     dcl-proc EndProgram;
+
+         clear CFS150M_MDS;
+         clear v_Record_index;
+
+         Subfile_Clear();
+
+         *INLR = *ON;
+
+     end-proc Endprogram;
+ 

@@ -1,0 +1,174 @@
+ /*------------------------------------------------------------------*/
+ /* Designed By: Hiram Hubbard                                       */
+ /*                                                                  */
+ /*     Program: IT280_BND  BNDSRC                                   */
+ /*                                                                  */
+ /* Service Pgm: ITR280S - Ext Tool Main Service Program             */
+ /*                                                                  */
+ /*    Function: use to re-compile service program with signature    */
+ /********************************************************************/
+ /* (C) Copyright VCCI, 2016                                         */
+ /* All rights reserved.                                             */
+ /*                                                                  */
+ /* Licensed Materials - Property of VCCI                            */
+ /********************************************************************/
+ /********************************************************************/
+ /*    Date    Initials  Mod ID      Description                     */
+ /*  --------  --------  --------    ------------------------------- */
+ /* 11/01/2016  Hiram    8921        Initial Write                   */
+ /*                                                                  */
+ /* 06/21/2018  Hiram    8921.3      Change to include Get FTP user  */
+ /*                                  information                     */
+ /********************************************************************/
+
+             STRPGMEXP  PGMLVL(*CURRENT) SIGNATURE('MOD8921.v9m0')
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+             EXPORT     SYMBOL('eXtMonitorSQL')
+             EXPORT     SYMBOL('eXtGetProgramName')
+             EXPORT     SYMBOL('eXtGoLogIt')
+             EXPORT     SYMBOL('eXtChkLocalAccess')
+             EXPORT     SYMBOL('eXtGetLocalAccessAppId')
+             EXPORT     SYMBOL('eXtAddServerAuthEntry')
+             EXPORT     SYMBOL('eXtRemoveServerAuthEntry')
+             EXPORT     SYMBOL('eXtRetrieveUserInfo')
+             EXPORT     SYMBOL('eXtGetFTPUserInfo')
+
+             ENDPGMEXP
+
+             STRPGMEXP  PGMLVL(*PRV) SIGNATURE('MOD8921.v8m0')
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+             EXPORT     SYMBOL('eXtMonitorSQL')
+             EXPORT     SYMBOL('eXtGetProgramName')
+             EXPORT     SYMBOL('eXtGoLogIt')
+             EXPORT     SYMBOL('eXtChkLocalAccess')
+             EXPORT     SYMBOL('eXtGetLocalAccessAppId')
+             EXPORT     SYMBOL('eXtAddServerAuthEntry')
+             EXPORT     SYMBOL('eXtRemoveServerAuthEntry')
+             EXPORT     SYMBOL('eXtRetrieveUserInfo')
+
+             ENDPGMEXP
+
+             STRPGMEXP  PGMLVL(*PRV) SIGNATURE('MOD8921.v7m0')
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+             EXPORT     SYMBOL('eXtMonitorSQL')
+             EXPORT     SYMBOL('eXtGetProgramName')
+             EXPORT     SYMBOL('eXtGoLogIt')
+             EXPORT     SYMBOL('eXtChkLocalAccess')
+             EXPORT     SYMBOL('eXtGetLocalAccessAppId')
+
+             ENDPGMEXP
+
+             STRPGMEXP  PGMLVL(*PRV) SIGNATURE('MOD8921.v6m0')
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+             EXPORT     SYMBOL('eXtMonitorSQL')
+             EXPORT     SYMBOL('eXtGetProgramName')
+             EXPORT     SYMBOL('eXtGoLogIt')
+             EXPORT     SYMBOL('eXtChkLocalAccess')
+
+             ENDPGMEXP
+
+             STRPGMEXP  PGMLVL(*PRV) SIGNATURE('MOD8921.v5m0')
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+             EXPORT     SYMBOL('eXtMonitorSQL')
+             EXPORT     SYMBOL('eXtGetProgramName')
+             EXPORT     SYMBOL('eXtGoLogIt')
+
+             ENDPGMEXP
+
+             STRPGMEXP  PGMLVL(*PRV) SIGNATURE('MOD8921.v4m0')
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+             EXPORT     SYMBOL('eXtMonitorSQL')
+             EXPORT     SYMBOL('eXtGetProgramName')
+
+             ENDPGMEXP
+
+             STRPGMEXP  PGMLVL(*PRV) SIGNATURE('MOD8921.v3m0')
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+             EXPORT     SYMBOL('eXtMonitorSQL')
+
+             ENDPGMEXP
+
+             STRPGMEXP  PGMLVL(*PRV) SIGNATURE('MOD8921.v2m0')
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+
+             ENDPGMEXP
+
+             STRPGMEXP  PGMLVL(*PRV) SIGNATURE('MOD8921.v1m0')
+
+
+             EXPORT     SYMBOL('eXtConnectionReSet')
+             EXPORT     SYMBOL('eXtConnectTo')
+             EXPORT     SYMBOL('eXtCurrentDataBase')
+             EXPORT     SYMBOL('eXtDisconnect')
+             EXPORT     SYMBOL('eXtGetApplicationKey')
+             EXPORT     SYMBOL('eXtGetRemoteDataBase')
+             EXPORT     SYMBOL('eXtSetApplicationKey')
+             EXPORT     SYMBOL('eXtSetConnection')
+             EXPORT     SYMBOL('eXtSetEncryptCCSID')
+
+             ENDPGMEXP
+  
